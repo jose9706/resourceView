@@ -1,9 +1,10 @@
 #include "raylib.h"
 #include "resource_dir.h" // utility header for SearchAndSetResourceDir
-#include "stdio.h"
-#include "stdlib.h"
 #include "system_params.h"
 #include "window_util.h"
+#include <stddef.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #define FREE(p)                                                                                                        \
     do                                                                                                                 \
@@ -12,11 +13,25 @@
         p = NULL;                                                                                                      \
     } while (0)
 
-void HandleMouseEvent()
+#define container_of(ptr, type, member) ((type *)((char *)ptr - offsetof(type, member)))
+
+void HandleMouseEvent(pSystemInfo sInfo)
 {
-    int mLocX = GetMouseX();
-    int mLocY = GetMouseY();
-    // RLAPI bool CheckCollisionPointCircle(Vector2 point, Vector2 center, float radius);
+    Vector2 point;
+    point.x = GetMouseX();
+    point.y = GetMouseY();
+    assert(sInfo->circlePtrArr != NULL);
+    pcircle *circles = sInfo->circlePtrArr;
+    for (size_t i = 0; i < sInfo->countOfCircles; i++)
+    {
+        pcircle circ = circles[i];
+        Vector2 circCenter = {.x = circ->xloc, .y = circ->yloc};
+        if (CheckCollisionPointCircle(point, circCenter, circ->r))
+        {
+            printf("INSIDE A CIRCLE WTF!\n");
+            parameter *p = container_of(circ, parameter, circ);
+        }
+    }
 }
 
 int main()
@@ -39,9 +54,7 @@ int main()
     {
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
         {
-            // Check where tf we are.
-            // RLAPI int GetMouseX(void); // Get mouse position X
-            // RLAPI int GetMouseY(void); // Get mouse position Y
+            HandleMouseEvent(allInfo);
         }
         GetData(allInfo);
         BeginDrawing();

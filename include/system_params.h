@@ -22,6 +22,7 @@
 #define GB (1024 * 1024) * 1024
 #define DIVISOR_1024 1024
 
+#define PVPARAM(param) param->genParam.paramVlong
 #define VPARAM(param) param.genParam.paramVlong
 #define DPARAM(param) param.genParam.paramDouble
 #define IPARAM(param) param.genParam.paramInt
@@ -58,6 +59,7 @@ typedef struct
 
     circle circ;
     int yMenuLoc;
+    bool drawable;
 } parameter, *pparameter;
 
 typedef struct
@@ -91,6 +93,7 @@ typedef struct
     pinfo generalInfo;
     pNetworkInfo network;
     circle **circlePtrArr;
+    size_t countOfCircles;
 } systemInfo, *pSystemInfo;
 
 /*-------- METHOD DEFINITIONS ------------*/

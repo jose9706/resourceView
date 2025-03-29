@@ -55,6 +55,7 @@ pSystemInfo SetUpSystemInfo()
     sysInfo->network->rxBytes.yMenuLoc = 440;
     arrput(sysInfo->circlePtrArr, &sysInfo->network->txBytes.circ);
     sysInfo->network->txBytes.yMenuLoc = 460;
+    sysInfo->countOfCircles = arrlen(sysInfo->circlePtrArr);
     return sysInfo;
 }
 

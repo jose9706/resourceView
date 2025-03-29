@@ -16,7 +16,7 @@
 
 /*------------ METHODS -----------*/
 
-void WriteParam(parameter param, char *subfix);
+void WriteParam(parameter *param, char *subfix);
 
 void WriteData(pSystemInfo allInfo);
 
