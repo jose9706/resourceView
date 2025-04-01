@@ -22,7 +22,11 @@ void WriteParam(parameter *param, char *subfix)
     {
         snprintf(formattedMsg, MENU_MAX_LEN, "%s : %llu", param->msg, PVPARAM(param));
     }
-    DrawText(formattedMsg, X_LOCATION_LIST, param->yMenuLoc, FONT_SIZE, WHITE);
+    if (param->drawable == YES_DRAW)
+    {
+        DrawText(formattedMsg, X_LOCATION_LIST, param->yMenuLoc, FONT_SIZE, WHITE);
+    }
+
     int xPixelOffset = MeasureText(formattedMsg, FONT_SIZE);
     DrawMenuCircle(X_LOCATION_LIST + xPixelOffset, param->yMenuLoc, &param->circ);
 }

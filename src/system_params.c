@@ -97,6 +97,7 @@ void GetSystemInformation(pinfo p)
     int res = sysinfo(&s);
     CHECK_ERR(res);
     IPARAM(p->numProc) = get_nprocs();
+    IPARAM(p->numProcesses) = s.procs;
     LPARAM(p->availPhysPages) = get_avphys_pages();
     VPARAM(p->usedRam) = (s.totalram - s.freeram) / MB;
     VPARAM(p->freeRam) = s.freeram / MB;
@@ -123,4 +124,16 @@ void GetData(pSystemInfo allInfo)
     GetSystemInformation(generalInfo);
     GetDiskSpaceInfo(diskData);
     GetNetworkInformation(network);
+}
+
+void FreeSystemInfo(pSystemInfo *allInfo)
+{
+    FREE((*allInfo)->diskInfo);
+    FREE((*allInfo)->generalInfo);
+    FREE((*allInfo)->network);
+
+    // No need to free each circle cause theyre not dynamically allocated.
+    // Need to free with stb free because its a dynamic array handled by them.
+    arrfree((*allInfo)->circlePtrArr);
+    FREE(*allInfo);
 }

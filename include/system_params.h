@@ -28,6 +28,14 @@
 #define IPARAM(param) param.genParam.paramInt
 #define LPARAM(param) param.genParam.paramLong
 
+// To prevent dangling pointers but its w/e in this app.
+#define FREE(p)                                                                                                        \
+    do                                                                                                                 \
+    {                                                                                                                  \
+        free(p);                                                                                                       \
+        p = NULL;                                                                                                      \
+    } while (0)
+
 #define CHECK_ERR(res)                                                                                                 \
     do                                                                                                                 \
     {                                                                                                                  \
@@ -38,6 +46,12 @@
     } while (0)
 
 /*---------------- STRUCTS ---------------*/
+
+enum DRAWABLE
+{
+    YES_DRAW,
+    NO_DRAW,
+};
 
 typedef struct
 {
@@ -59,7 +73,7 @@ typedef struct
 
     circle circ;
     int yMenuLoc;
-    bool drawable;
+    enum DRAWABLE drawable;
 } parameter, *pparameter;
 
 typedef struct
@@ -99,15 +113,9 @@ typedef struct
 /*-------- METHOD DEFINITIONS ------------*/
 pSystemInfo SetUpSystemInfo();
 
-ulong GetNetWorkParamFromFile(char *fileToRead);
-
-void GetNetworkInformation(pNetworkInfo n);
-
-void GetSystemInformation(pinfo p);
-
-void GetDiskSpaceInfo(pDiskInfo diskData);
-
 // Retrieves and populates all system information.
 void GetData(pSystemInfo allInfo);
+
+void FreeSystemInfo(pSystemInfo *allInfo);
 
 #endif // SYSTEM_PARAMS_H

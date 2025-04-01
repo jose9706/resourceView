@@ -2,18 +2,18 @@
 #include "resource_dir.h" // utility header for SearchAndSetResourceDir
 #include "system_params.h"
 #include "window_util.h"
+#include <pthread.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <threads.h>
+#include <unistd.h>
 
-#define FREE(p)                                                                                                        \
-    do                                                                                                                 \
-    {                                                                                                                  \
-        free(p);                                                                                                       \
-        p = NULL;                                                                                                      \
-    } while (0)
+// Funny trick to get the paramter/structure that contains a circle.
+#define CONTAINER_OF(ptr, type, member) ((type *)((char *)ptr - offsetof(type, member)))
 
-#define container_of(ptr, type, member) ((type *)((char *)ptr - offsetof(type, member)))
+pSystemInfo allInfo;
+pthread_mutex_t lock;
 
 void HandleMouseEvent(pSystemInfo sInfo)
 {
@@ -28,10 +28,20 @@ void HandleMouseEvent(pSystemInfo sInfo)
         Vector2 circCenter = {.x = circ->xloc, .y = circ->yloc};
         if (CheckCollisionPointCircle(point, circCenter, circ->r))
         {
-            printf("INSIDE A CIRCLE WTF!\n");
-            parameter *p = container_of(circ, parameter, circ);
+            parameter *p = CONTAINER_OF(circ, parameter, circ);
+            p->drawable = p->drawable == YES_DRAW ? NO_DRAW : YES_DRAW;
         }
     }
+}
+
+void *DataGatheringThread(void *args)
+{
+    while (1)
+    {
+        GetData(allInfo);
+        usleep(300000);
+    }
+    return NULL;
 }
 
 int main()
@@ -47,7 +57,11 @@ int main()
 
     // Load a texture from the resources directory
     Texture wabbit = LoadTexture("wabbit_alpha.png");
-    pSystemInfo allInfo = SetUpSystemInfo();
+    allInfo = SetUpSystemInfo();
+    pthread_mutex_init(&lock, NULL);
+    pthread_t myThread;
+    pthread_create(&myThread, NULL, DataGatheringThread, NULL);
+    pthread_detach(myThread);
     // game loop
     while (!WindowShouldClose()) // run the loop untill the user presses ESCAPE
                                  // or presses the Close button on the window
@@ -56,7 +70,6 @@ int main()
         {
             HandleMouseEvent(allInfo);
         }
-        GetData(allInfo);
         BeginDrawing();
         ClearBackground(BLACK);
         DrawFPS(XLOC_FPS, YLOC_FPS);
@@ -70,7 +83,6 @@ int main()
     // cleanup
     // unload our texture so it can be cleaned up
     UnloadTexture(wabbit);
-    FREE(allInfo);
     // destroy the window and cleanup the OpenGL context
     CloseWindow();
     return 0;
